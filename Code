@@ -1,0 +1,54 @@
+#include <Brain.h>
+Brain brain(Serial);
+const int greenPin = 2;
+const int yellowPin = 4;
+const int redPin = 7;
+long interval = 500;
+long previousMillis = 0;
+int ledState = LOW;
+
+int attValue;
+void setup() {
+// Set up the LED pin.
+pinMode(greenPin, OUTPUT);
+pinMode(yellowPin, OUTPUT);
+pinMode(redPin, OUTPUT);
+
+// Start the hardware serial.
+Serial.begin(9600);
+}
+void loop() {
+// Expect packets about once per second.
+if (brain.update()) {
+Serial.println(brain.readCSV());
+
+// Attention runs from 0 to 100.
+attValue = brain.readAttention();
+}
+// Make sure we have a signal.
+if(brain.readSignalQuality() == 0) {
+
+// Light up the green LED
+if (attValue < 40) {
+digitalWrite( greenPin, HIGH);
+digitalWrite( yellowPin, LOW);
+digitalWrite( redPin, LOW);
+}
+
+//Light up the Yellow LED
+else if (attValue < 70 and attValue > 40)
+{
+digitalWrite( yellowPin, HIGH);
+digitalWrite( greenPin, LOW);
+digitalWrite( redPin, LOW);
+}
+
+//Light up the red LED
+else if (attValue >70)
+{
+digitalWrite( redPin, HIGH);
+digitalWrite( greenPin, LOW);
+digitalWrite( yellowPin, LOW);
+}
+}
+}
